@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoCial Vendor Import Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-900">🚀 ShoCial Vendor Import Studio</h1>
+            <p class="mt-2 text-lg text-gray-600">AI-Powered Web Scraper & Product Extractor</p>
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">1. Configure Crawl</h2>
+            
+            <form id="crawlForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Vendor Name</label>
+                        <input type="text" id="vendorName" placeholder="e.g. Keeva Exports" required 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700">Base Domain</label>
+                        <input type="url" id="baseUrl" placeholder="https://keevaaexports.com" required 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Start URL (Collection / Search Page)</label>
+                    <input type="url" id="startUrl" placeholder="https://keevaaexports.com/collections/all" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Page Limit (Max Pages to Crawl)</label>
+                    <input type="number" id="pageLimit" value="50" min="1" max="500"
+                        class="mt-1 block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" id="startBtn"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        🚀 Start AI Crawl
+                    </button>
+                    <!-- Loading State -->
+                     <button disabled id="loadingBtn" style="display:none;"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-400 cursor-not-allowed">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Initializing...
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="statusPanel" class="hidden bg-white shadow rounded-lg p-6">
+             <h2 class="text-xl font-semibold mb-4 text-gray-800">2. Live Status</h2>
+             
+             <div class="mb-4">
+                 <div class="flex justify-between text-sm font-medium text-gray-500 mb-1">
+                     <span id="statusText">Running...</span>
+                     <span id="progressText">0 extracted</span>
+                 </div>
+                 <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 5%"></div>
+                </div>
+             </div>
+
+             <div class="grid grid-cols-3 gap-4 text-center">
+                 <div class="bg-blue-50 p-4 rounded-lg">
+                     <p class="text-2xl font-bold text-blue-600" id="statDiscovered">0</p>
+                     <p class="text-xs text-gray-500 uppercase tracking-wide">Discovered Pages</p>
+                 </div>
+                 <div class="bg-green-50 p-4 rounded-lg">
+                     <p class="text-2xl font-bold text-green-600" id="statExtracted">0</p>
+                     <p class="text-xs text-gray-500 uppercase tracking-wide">Products Extracted</p>
+                 </div>
+                  <div class="bg-red-50 p-4 rounded-lg">
+                     <p class="text-2xl font-bold text-red-600" id="statFailed">0</p>
+                     <p class="text-xs text-gray-500 uppercase tracking-wide">Failed / Skipped</p>
+                 </div>
+             </div>
+
+             <div class="mt-6 flex justify-end">
+                 <a id="previewLink" href="#" class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none">
+                     View Preview & Export &rarr;
+                 </a>
+             </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
