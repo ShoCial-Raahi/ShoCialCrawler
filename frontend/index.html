@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoCial Vendor Import Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900">
+
+    <div class="max-w-4xl mx-auto py-12 px-6">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+                ShoCial Vendor Import Studio
+            </h1>
+            <p class="text-gray-600">Serverless AI Crawler & Extractor</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100">
+            <h2 class="text-xl font-semibold mb-6">1. Start New Crawl</h2>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
+                    <strong>How to crawl:</strong>
+                    <ol class="list-decimal ml-5 mt-2 space-y-1">
+                        <li>Click the button below to open GitHub Actions.</li>
+                        <li>Click <strong>Run workflow</strong> (blue button on right).</li>
+                        <li>Enter <strong>Vendor URL</strong> and <strong>Start URL</strong>.</li>
+                        <li>Wait for the workflow to finish (check "Actions" tab).</li>
+                    </ol>
+                </div>
+
+                <a href="https://github.com/ShoCial-Raahi/ShoCialCrawler/actions/workflows/crawl.yml" 
+                   target="_blank"
+                   class="block w-full text-center py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-md">
+                    🚀 Launch Crawler on GitHub
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+            <h2 class="text-xl font-semibold mb-6 flex justify-between items-center">
+                2. Latest Results
+                <a href="preview.html" class="text-sm text-indigo-600 hover:underline font-medium">View Full Table →</a>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="data/products.csv" download class="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span class="font-medium">Download Latest CSV</span>
+                </a>
+                
+                 <a href="preview.html" class="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    <span class="font-medium">View Latest Preview</span>
+                </a>
+            </div>
+            
+             <p class="text-xs text-gray-400 mt-4 text-center">
+                Note: Results update only after the GitHub Action completes successfully.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

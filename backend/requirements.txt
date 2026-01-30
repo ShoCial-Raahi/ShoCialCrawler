@@ -1,0 +1,8 @@
+crawl4ai==0.4.0
+playwright
+python-dotenv
+openai
+pandas
+jinja2
+aiofiles
+nest_asyncio
