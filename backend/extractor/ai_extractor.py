@@ -9,7 +9,8 @@ class AIExtractor:
             api_key=Config.OPENAI_API_KEY,
             base_url=Config.AI_PROVIDER_BASE_URL
         )
-        with open("extractor/prompt.txt", "r") as f:
+        prompt_path = os.path.join(os.path.dirname(__file__), "prompt.txt")
+        with open(prompt_path, "r") as f:
             self.prompt_template = f.read()
 
     async def extract(self, html_content: str):
