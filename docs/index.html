@@ -205,8 +205,11 @@
                 });
 
                 if (response.ok) {
-                    statusEl.innerText = "✅ Crawl Started Successfully! Check the 'Actions' tab or come back in ~3 mins.";
-                    statusEl.className = "p-4 rounded-md text-sm bg-green-50 text-green-700 border border-green-200 block";
+                    statusEl.innerText = "🚀 Crawl Started! Monitoring progress...";
+                    statusEl.className = "p-4 rounded-md text-sm bg-blue-50 text-blue-700 border border-blue-200 block";
+
+                    // Start Polling
+                    startPolling(config);
                 } else {
                     const err = await response.text();
                     throw new Error(err);
@@ -221,7 +224,52 @@
                 document.getElementById('loadingState').style.display = 'none';
             }
         }
-    </script>
-</body>
 
-</html>
+        let pollInterval;
+
+        function startPolling(config) {
+            if (pollInterval) clearInterval(pollInterval);
+
+            const statusEl = document.getElementById('statusMsg');
+            const url = `https://api.github.com/repos/${config.user}/${config.repo}/actions/runs?event=workflow_dispatch&per_page=1`;
+
+            pollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'Authorization': `Bearer ${config.token}` }
+                    });
+                    const data = await res.json();
+
+                    if (data.workflow_runs && data.workflow_runs.length > 0) {
+                        const latestRun = data.workflow_runs[0];
+
+                        // Check if this run is recent (within last 5 mins) to avoid showing old runs
+                        const runTime = new Date(latestRun.created_at).getTime();
+                        const now = new Date().getTime();
+                        if ((now - runTime) > 5 * 60 * 1000 && latestRun.status === 'completed') {
+                            // This is likely an old run, ignore or show "Ready"
+                            return;
+                        }
+
+                        if (latestRun.status === 'completed') {
+                            clearInterval(pollInterval);
+                            if (latestRun.conclusion === 'success') {
+                                statusEl.innerHTML = `✅ <strong>Crawl Completed!</strong> <br>Results are saved. <a href="preview.html" class="underline font-bold">View Results Now</a>.`;
+                                statusEl.className = "p-4 rounded-md text-sm bg-green-50 text-green-700 border border-green-200 block";
+                            } else {
+                                statusEl.innerText = `❌ Crawl Failed. Check GitHub Actions logs for details.`;
+                                statusEl.className = "p-4 rounded-md text-sm bg-red-50 text-red-700 border border-red-200 block";
+                            }
+                        } else {
+                            statusEl.innerText = `⏳ Status: ${latestRun.status} (Running)... This usually takes 2-3 minutes.`;
+                            statusEl.className = "p-4 rounded-md text-sm bg-yellow-50 text-yellow-700 border border-yellow-200 block";
+                        }
+                    }
+                } catch (e) {
+                    console.error("Polling error", e);
+                }
+            }, 10000); // Poll every 10s
+        }
+</body >
+
+</html >
