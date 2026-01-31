@@ -55,7 +55,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Fetch data from local relative path (committed by Action)
-                const res = await fetch('data/latest.json?t=' + listDate.now());
+                const res = await fetch('data/latest.json?t=' + Date.now());
                 if (!res.ok) throw new Error("No data found");
 
                 const products = await res.json();

@@ -20,7 +20,7 @@ from config import Config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("vendor_import")
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
 async def run_crawl(vendor_name: str, start_url: str, page_limit: int = 50):
