@@ -25,24 +25,77 @@
             <p class="text-gray-600">Serverless AI Crawler & Extractor</p>
         </header>
 
+        <!-- Settings Section (API Key) -->
+        <div class="mb-8 flex justify-end">
+            <button onclick="toggleSettings()" class="text-sm text-gray-500 hover:text-indigo-600 underline">
+                ⚙️ Configure GitHub Token
+            </button>
+        </div>
+
+        <div id="settingsPanel" class="hidden bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+            <h3 class="text-sm font-semibold mb-2">GitHub Configuration</h3>
+            <p class="text-xs text-gray-500 mb-4">Required to start crawls directly from this page without being
+                redirected.</p>
+
+            <div class="grid gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">GitHub Username</label>
+                    <input type="text" id="ghUsername" class="w-full px-3 py-2 border rounded-md text-sm"
+                        placeholder="ShoCial-Raahi">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Repository Name</label>
+                    <input type="text" id="ghRepo" class="w-full px-3 py-2 border rounded-md text-sm"
+                        placeholder="ShoCialCrawler">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Personal Access Token (PAT)</label>
+                    <input type="password" id="ghToken" class="w-full px-3 py-2 border rounded-md text-sm"
+                        placeholder="ghp_...">
+                    <p class="text-[10px] text-gray-400 mt-1">Token needs 'actions:write' permission. Saved mostly
+                        locally.</p>
+                </div>
+                <button onclick="saveSettings()"
+                    class="w-full py-2 bg-gray-800 text-white rounded-md text-sm hover:bg-gray-900">Save
+                    Configuration</button>
+            </div>
+        </div>
+
+        <!-- Main Form -->
         <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100">
             <h2 class="text-xl font-semibold mb-6">1. Start New Crawl</h2>
 
             <div class="space-y-4">
-                <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800">
-                    <strong>How to crawl:</strong>
-                    <ol class="list-decimal ml-5 mt-2 space-y-1">
-                        <li>Click the button below to open GitHub Actions.</li>
-                        <li>Click <strong>Run workflow</strong> (blue button on right).</li>
-                        <li>Enter <strong>Vendor URL</strong> and <strong>Start URL</strong>.</li>
-                        <li>Wait for the workflow to finish (check "Actions" tab).</li>
-                    </ol>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vendor Name</label>
+                        <input type="text" id="vendorName" class="w-full px-3 py-2 border rounded-md"
+                            placeholder="e.g. Keeva Exports">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Page Limit</label>
+                        <input type="number" id="pageLimit" class="w-full px-3 py-2 border rounded-md" value="50">
+                    </div>
                 </div>
 
-                <a href="https://github.com/ShoCial-Raahi/ShoCialCrawler/actions/workflows/crawl.yml" target="_blank"
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Start URL</label>
+                    <input type="text" id="startUrl" class="w-full px-3 py-2 border rounded-md"
+                        placeholder="https://example.com/collections/all">
+                </div>
+
+                <button id="startBtn" onclick="triggerWorkflow()"
                     class="block w-full text-center py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition shadow-md">
-                    🚀 Launch Crawler on GitHub
-                </a>
+                    🚀 Start AI Crawl
+                </button>
+
+                <div id="loadingState" class="hidden text-center py-4">
+                    <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full"
+                        role="status"></div>
+                    <span class="ml-2 text-indigo-600 font-medium">Triggering Workflow...</span>
+                </div>
+
+                <div id="statusMsg" class="hidden p-4 rounded-md text-sm"></div>
             </div>
         </div>
 
@@ -77,10 +130,98 @@
             </div>
 
             <p class="text-xs text-gray-400 mt-4 text-center">
-                Note: Results update only after the GitHub Action completes successfully.
+                Note: After starting a crawl, wait ~2-5 minutes for results to appear here.
             </p>
         </div>
     </div>
+
+    <script>
+        // Load Settings
+        const STORE_KEY = 'shocial_gh_config';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const config = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+            if (config.user) document.getElementById('ghUsername').value = config.user;
+            if (config.repo) document.getElementById('ghRepo').value = config.repo;
+            if (config.token) document.getElementById('ghToken').value = config.token;
+        });
+
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            const user = document.getElementById('ghUsername').value;
+            const repo = document.getElementById('ghRepo').value;
+            const token = document.getElementById('ghToken').value;
+
+            localStorage.setItem(STORE_KEY, JSON.stringify({ user, repo, token }));
+            alert('Settings saved!');
+            toggleSettings();
+        }
+
+        async function triggerWorkflow() {
+            const config = JSON.parse(localStorage.getItem(STORE_KEY));
+            if (!config || !config.token) {
+                alert('Please configure your GitHub Token first (Click the ⚙️ icon above)');
+                toggleSettings();
+                return;
+            }
+
+            const vendorName = document.getElementById('vendorName').value;
+            const startUrl = document.getElementById('startUrl').value;
+            const pageLimit = document.getElementById('pageLimit').value; // String is fine for JSON
+
+            if (!vendorName || !startUrl) {
+                alert('Please fill in Vendor Name and Start URL');
+                return;
+            }
+
+            // UI Loading
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            const statusEl = document.getElementById('statusMsg');
+            statusEl.classList.add('hidden');
+
+            try {
+                const workflowId = 'crawl.yml';
+                const url = `https://api.github.com/repos/${config.user}/${config.repo}/actions/workflows/${workflowId}/dispatches`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            vendor_name: vendorName,
+                            start_url: startUrl,
+                            page_limit: pageLimit
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    statusEl.innerText = "✅ Crawl Started Successfully! Check the 'Actions' tab or come back in ~3 mins.";
+                    statusEl.className = "p-4 rounded-md text-sm bg-green-50 text-green-700 border border-green-200 block";
+                } else {
+                    const err = await response.text();
+                    throw new Error(err);
+                }
+
+            } catch (error) {
+                console.error(error);
+                statusEl.innerText = `❌ Error: ${error.message}`;
+                statusEl.className = "p-4 rounded-md text-sm bg-red-50 text-red-700 border border-red-200 block";
+            } finally {
+                document.getElementById('startBtn').style.display = 'block';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+    </script>
 </body>
 
 </html>
