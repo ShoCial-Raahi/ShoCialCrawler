@@ -1,0 +1,13 @@
+{
+  "site_name": "example_site",
+  "base_url": "https://www.scrapingbee.com/blog/web-scraping-python/",
+  "product_list_selector": ".post-feed article",
+  "fields": {
+    "title": ".post-card-title",
+    "image": ".post-card-image",
+    "product_link": ".post-card-image-link"
+  },
+  "pagination": {
+    "type": "scroll"
+  }
+}
